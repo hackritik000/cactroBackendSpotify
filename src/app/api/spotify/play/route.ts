@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   if (!uri) return new Response("Missing uri", { status: 400 });
 
-  const token = getAccessToken();
+  const token = await getAccessToken();
 
   await axios.put(
     "https://api.spotify.com/v1/me/player/play",
