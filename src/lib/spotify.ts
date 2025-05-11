@@ -1,4 +1,5 @@
 import axios from "axios";
+import { cookies } from "next/headers";
 
 const client_id = process.env.SPOTIFY_CLIENT_ID!;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET!;
@@ -28,7 +29,7 @@ export function getLoginURL() {
   return `https://accounts.spotify.com/authorize?${query}`;
 }
 
-export async function handleCallback(code: string) {
+export async function handleCallback(code: string): Promise<string> {
   const response = await axios.post(
     "https://accounts.spotify.com/api/token",
     new URLSearchParams({
@@ -46,7 +47,7 @@ export async function handleCallback(code: string) {
     },
   );
 
-  access_token = response.data.access_token;
+  access_token = response.data.access_token as string;
   refresh_token = response.data.refresh_token;
   return access_token;
 }
@@ -74,6 +75,11 @@ export async function refreshAccessToken() {
   return access_token;
 }
 
-export function getAccessToken() {
+export async function getAccessToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+  if (token) {
+    access_token = token.value;
+  }
   return access_token;
 }
